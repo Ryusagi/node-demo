@@ -59,6 +59,9 @@ const seed = async () => {
 const connectMongo = async () => {
   if (db) return;
 
+  console.log("DB URL exists:", !!process.env.MONGO_URL);
+  console.log("DB URL length:", process.env.MONGO_URL?.length);
+
   client = new MongoClient(mongoUrl);
   await client.connect();
   db = client.db(dbName);
@@ -70,14 +73,6 @@ const connectMongo = async () => {
   await users.deleteMany({});
   await sessions.deleteMany({});
   await timers.deleteMany({});
-
-  // индексы
-  /*await users.createIndex({ id: 1 }, { unique: true });
-  await users.createIndex({ username: 1 }, { unique: true });
-  await sessions.createIndex({ id: 1 }, { unique: true });
-  await timers.createIndex({ id: 1 }, { unique: true });
-  await timers.createIndex({ user_id: 1 });
-  */
 
   // сид сразу после очистки
   await seed();

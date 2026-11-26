@@ -59,9 +59,6 @@ const seed = async () => {
 const connectMongo = async () => {
   if (db) return;
 
-  console.log("DB URL exists:", !!process.env.MONGO_URL);
-  console.log("DB URL length:", process.env.MONGO_URL?.length);
-
   client = new MongoClient(mongoUrl);
   await client.connect();
   db = client.db(dbName);

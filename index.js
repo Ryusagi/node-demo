@@ -22,6 +22,7 @@ const connectMongo = async () => {
   if (db) return;
 
   client = new MongoClient(mongoUrl);
+  console.log(mongoUrl);
   await client.connect();
   db = client.db(dbName);
 

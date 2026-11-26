@@ -18,11 +18,49 @@ let users;
 let sessions;
 let timers;
 
+const hash = (text) => text;
+
+const USERS = [
+  {
+    id: randomUUID(),
+    username: "admin",
+    password: hash("pwd007"),
+  },
+];
+
+// seed объявлен ДО connectMongo, чтобы его можно было вызвать сразу после очистки
+const seed = async () => {
+  await users.insertMany(USERS);
+
+  const admin = await users.findOne({ username: "admin" });
+  if (!admin) return;
+
+  const TIMERS = [
+    {
+      id: randomUUID(),
+      user_id: admin.id,
+      start: Date.now(),
+      description: "Timer 1",
+      is_active: true,
+    },
+    {
+      id: randomUUID(),
+      user_id: admin.id,
+      start: Date.now() - 5000,
+      end: Date.now() - 3000,
+      duration: 2000,
+      description: "Timer 0",
+      is_active: false,
+    },
+  ];
+
+  await timers.insertMany(TIMERS);
+};
+
 const connectMongo = async () => {
   if (db) return;
 
   client = new MongoClient(mongoUrl);
-  console.log(mongoUrl);
   await client.connect();
   db = client.db(dbName);
 
@@ -30,15 +68,20 @@ const connectMongo = async () => {
   sessions = db.collection("sessions");
   timers = db.collection("timers");
 
+  // очистка
   await users.deleteMany({});
   await sessions.deleteMany({});
   await timers.deleteMany({});
 
+  // индексы
   await users.createIndex({ id: 1 }, { unique: true });
   await users.createIndex({ username: 1 }, { unique: true });
   await sessions.createIndex({ id: 1 }, { unique: true });
   await timers.createIndex({ id: 1 }, { unique: true });
   await timers.createIndex({ user_id: 1 });
+
+  // сид сразу после очистки
+  await seed();
 };
 
 const findUserByUsername = async (username) => users.findOne({ username });
@@ -258,56 +301,6 @@ app.use((err, req, res, next) => {
   console.error(err);
   if (res.headersSent) return next(err);
   res.status(500).json({ error: "Internal server error" });
-});
-
-const hash = (text) => text;
-
-const USERS = [
-  {
-    id: randomUUID(),
-    username: "admin",
-    password: hash("pwd007"),
-  },
-];
-
-const seed = async () => {
-  const userCount = await users.countDocuments();
-  if (userCount > 0) return;
-
-  await users.insertMany(USERS);
-
-  const admin = await users.findOne({ username: "admin" });
-  if (!admin) return;
-
-  const TIMERS = [
-    {
-      id: randomUUID(),
-      user_id: admin.id,
-      start: Date.now(),
-      description: "Timer 1",
-      is_active: true,
-    },
-    {
-      id: randomUUID(),
-      user_id: admin.id,
-      start: Date.now() - 5000,
-      end: Date.now() - 3000,
-      duration: 2000,
-      description: "Timer 0",
-      is_active: false,
-    },
-  ];
-
-  await timers.insertMany(TIMERS);
-};
-
-app.use(async (req, res, next) => {
-  try {
-    await seed();
-    next();
-  } catch (err) {
-    next(err);
-  }
 });
 
 if (process.env.NODE_ENV !== "production") {

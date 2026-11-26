@@ -9,7 +9,6 @@ const path = require("path");
 require("dotenv").config();
 
 const mongoUrl = process.env.MONGO_URL;
-//test "mongodb://elizavetabelayamail_db_user:LFsLS5MuMJOTP7o3@ac-tfa6afe-shard-00-00.tx844a1.mongodb.net:27017,ac-tfa6afe-shard-00-01.tx844a1.mongodb.net:27017,ac-tfa6afe-shard-00-02.tx844a1.mongodb.net:27017/?ssl=true&replicaSet=atlas-4y2xeh-shard-0&authSource=admin";
 const dbName = process.env.DB_NAME || "timers_db";
 
 let client;

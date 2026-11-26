@@ -68,17 +68,17 @@ const connectMongo = async () => {
   sessions = db.collection("sessions");
   timers = db.collection("timers");
 
-  // очистка
   await users.deleteMany({});
   await sessions.deleteMany({});
   await timers.deleteMany({});
 
   // индексы
-  await users.createIndex({ id: 1 }, { unique: true });
+  /*await users.createIndex({ id: 1 }, { unique: true });
   await users.createIndex({ username: 1 }, { unique: true });
   await sessions.createIndex({ id: 1 }, { unique: true });
   await timers.createIndex({ id: 1 }, { unique: true });
   await timers.createIndex({ user_id: 1 });
+  */
 
   // сид сразу после очистки
   await seed();

@@ -93,9 +93,6 @@
     },
     created() {
       this.fetchActiveTimers();
-      setInterval(() => {
-        this.fetchActiveTimers();
-      }, 1000);
       this.fetchOldTimers();
     },
   });
